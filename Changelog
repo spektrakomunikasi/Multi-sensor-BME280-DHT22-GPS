@@ -1,0 +1,107 @@
+# Changelog
+
+Semua perubahan penting pada proyek ini didokumentasikan di file ini.
+
+Format mengikuti gaya **Keep a Changelog** dan versi semantik sederhana.
+
+---
+
+## [v2.4] - 2026-05-05
+
+### Added
+- Auto reboot harian jam **03:00** (berdasarkan waktu NTP lokal).
+- Scheduler reboot aman: hanya **sekali per hari** (anti-trigger berulang).
+- Konfigurasi retention log dari dashboard via endpoint:
+  - `POST /setretention`
+  - rentang nilai `1..60` hari.
+- Penyimpanan retention ke `Preferences` namespace `cfg` key `ret_days`.
+- Field JSON baru di `/api`:
+  - `log_retention_days`
+- Tombol/form dashboard untuk set retention langsung dari web.
+- Pembersihan log lama (`cleanupOldLogs`) langsung dieksekusi setelah retention diubah.
+
+### Changed
+- Retention sebelumnya konstanta statis diubah menjadi variabel runtime:
+  - dari `LOG_RETENTION_DAYS` menjadi `logRetentionDays`.
+- Log cleanup harian sekarang mengikuti nilai retention dinamis dari Preferences.
+- Stabilitas operasi 24/7 ditingkatkan dengan reboot terjadwal.
+
+### Fixed
+- Perbaikan compile issue pada `handleApi()` akibat baris JSON terpotong.
+- Perapihan susunan respons JSON agar valid dan konsisten.
+- Catatan kompatibilitas library `TinyGPSPlus` (hindari duplikasi library).
+
+---
+
+## [v2.3] - 2026-05-05
+
+### Added
+- Retention log fleksibel (angka bebas) dari dashboard.
+- Validasi input retention `1..60`.
+- Sinkronisasi nilai retention aktif ke UI (auto-fill input).
+
+### Changed
+- API dashboard menampilkan nilai retention aktif.
+- Mekanisme penghapusan log lama disesuaikan dengan setting retention baru.
+
+### Fixed
+- Peningkatan ketahanan saat NTP belum valid (skip cleanup jika epoch belum siap).
+
+---
+
+## [v2.2] - 2026-05-05
+
+### Added
+- Daily CSV logging stabil ke SPIFFS.
+- Endpoint manajemen log:
+  - `/listlogs`
+  - `/download`
+  - `/viewlog`
+  - `/clearlogtoday`
+- WiFi manager:
+  - simpan SSID/password
+  - clear credential
+- Recalibrate baseline altitude relatif (`/recalibrate`).
+- GPS auto-baud detect (`9600/38400/115200`).
+- Dashboard gauge + chart + fallback mode saat CDN chart gagal.
+
+### Changed
+- Optimasi tampilan LCD agar minim flicker (cache per baris + scheduler update).
+- Optimasi eco mode:
+  - CPU 80 MHz
+  - WiFi sleep aktif
+  - TX power dibatasi
+
+### Fixed
+- Perbaikan fallback pembacaan sensor suhu/kelembaban (BME280 ↔ DHT22).
+- Perbaikan reliabilitas koneksi STA (retry berkala saat terputus).
+
+---
+
+## [v2.1] - 2026-05-04
+
+### Added
+- Integrasi multi-sensor dasar (BME280 + DHT22 + GPS).
+- AP mode default untuk akses dashboard lokal.
+- API status dasar untuk monitoring.
+
+### Changed
+- Penyesuaian struktur data log dan output serial diagnostik.
+
+---
+
+## [v2.0] - 2026-05-04
+
+### Added
+- Arsitektur awal dashboard monitoring + logging.
+- Fondasi baseline pressure untuk ALT REL.
+
+---
+
+## Catatan Upgrade ke v2.4
+- Tidak ada migrasi data wajib.
+- Nilai retention lama otomatis fallback ke `7` hari jika key Preferences belum ada.
+- Setelah upgrade, verifikasi:
+  1. `/api` memunculkan `log_retention_days`
+  2. Form retention di dashboard berfungsi
+  3. Serial log menampilkan trigger reboot 03:00 (saat waktunya).
