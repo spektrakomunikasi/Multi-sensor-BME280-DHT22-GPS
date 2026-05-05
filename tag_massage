@@ -1,0 +1,9 @@
+v2.4 - Stable release (2026-05-05)
+
+Highlights:
+- Daily auto reboot at 03:00 (once per day, NTP-based)
+- Configurable log retention from dashboard (1..60 days)
+- Retention persisted in Preferences (cfg/ret_days)
+- API includes log_retention_days
+- Improved long-run stability for 24/7 operation
+- Fix for handleApi JSON/compile issue
