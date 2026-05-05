@@ -1,0 +1,100 @@
+# Release Notes — v2.4 (2026-05-05)
+
+## Ringkasan
+Rilis **v2.4** fokus pada **stabilitas operasi jangka panjang** dan **fleksibilitas manajemen log** tanpa menambah kompleksitas menu.
+
+Target utama tercapai:
+- Device tetap ringan untuk pemakaian harian.
+- Retention log bisa diatur langsung dari dashboard.
+- Auto reboot terjadwal menjaga kestabilan runtime 24/7.
+
+---
+
+## ✅ Highlight Utama
+
+### 1) Auto Reboot Harian (03:00)
+- Sistem restart otomatis **setiap hari jam 03:00**.
+- Trigger hanya **sekali per hari** (menggunakan penanda hari `tm_yday`).
+- Aman terhadap loop reboot berulang pada menit yang sama.
+
+**Manfaat:**
+- Mengurangi risiko degradasi performa jangka panjang.
+- Menjaga layanan dashboard dan logging tetap responsif.
+
+---
+
+### 2) Retention Log Fleksibel (1..60 Hari)
+- Retention sekarang dapat diubah via web dashboard (angka bebas).
+- Endpoint:
+  - `POST /setretention`
+- Validasi input:
+  - minimum 1 hari
+  - maksimum 60 hari
+- Nilai disimpan persisten di:
+  - `Preferences` namespace `cfg`
+  - key `ret_days`
+
+**Manfaat:**
+- Menyesuaikan kebutuhan penyimpanan vs histori data tanpa ubah sketch.
+
+---
+
+### 3) API Lebih Informatif
+`/api` kini menambahkan:
+- `log_retention_days`
+
+**Manfaat:**
+- UI dapat menampilkan retention aktif secara real-time.
+- Memudahkan integrasi monitoring eksternal.
+
+---
+
+## 🔧 Perbaikan Teknis pada v2.4
+
+- Fix compile issue di `handleApi()` (baris JSON terpotong).
+- Konsistensi format JSON API ditingkatkan.
+- Cleanup log lama langsung dijalankan setelah retention diubah.
+- Stabilitas runtime ditingkatkan tanpa menambah beban UI.
+
+---
+
+## Endpoint Terkait v2.4
+
+- `GET /api` → termasuk field `log_retention_days`
+- `POST /setretention` → set retention `1..60`
+- Mekanisme auto reboot internal → aktif otomatis jam 03:00
+
+---
+
+## Verifikasi Cepat Setelah Upgrade
+
+1. Buka dashboard, ubah retention (mis. 14), klik **Save Retention**.
+2. Reload halaman, pastikan nilai tetap 14.
+3. Cek `/api`, pastikan ada:
+   - `"log_retention_days":14`
+4. Pastikan logging normal (download CSV tetap bisa).
+5. Tunggu jadwal 03:00 untuk validasi auto reboot (pantau Serial log).
+
+---
+
+## Dampak ke Pengguna
+- Tidak ada perubahan alur utama dashboard (tetap simpel).
+- Tidak ada langkah migrasi wajib.
+- Konfigurasi lama tetap kompatibel.
+
+---
+
+## Catatan Operasional
+- Pastikan NTP valid agar jadwal reboot 03:00 akurat.
+- Jika internet tidak tersedia, waktu bisa terlambat sinkron (reboot menunggu waktu valid).
+- Hindari duplikasi library `TinyGPSPlus` di Arduino libraries.
+
+---
+
+## File Sketch Final Rilis
+Disarankan menggunakan file final:
+- `ESP32_MULTI_SENSOR_FINAL_V2_4_3AM_REBOOT.ino`
+
+---
+
+Terima kasih — v2.4 dirancang agar perangkat tetap **simple, stabil, dan siap jalan terus**.
